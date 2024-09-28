@@ -1,0 +1,2 @@
+1. initilize go projext : go mod init github.com/bigzirook/movie-ticket-booking (project name)
+2. initilize gin package : go get -u github.com/gin-gonic/gin
