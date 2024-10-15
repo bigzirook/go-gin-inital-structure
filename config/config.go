@@ -1,41 +1,34 @@
 package config
 
 import (
-    "fmt"
-    "log"
-    "os"
+	"fmt"
+	"os"
 
-    "gorm.io/driver/mysql"
-    "gorm.io/gorm"
-    "github.com/joho/godotenv"
+	_ "github.com/go-sql-driver/mysql" // MySQL driver
+	"github.com/jinzhu/gorm"
+	"github.com/joho/godotenv"
 )
 
 var DB *gorm.DB
 
-// LoadEnv loads environment variables from .env file
+// LoadEnv loads environment variables
 func LoadEnv() {
-    err := godotenv.Load()
-    if err != nil {
-        log.Println("No .env file found, using default environment variables")
-    }
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
 }
 
-// ConnectDB initializes the database connection using environment variables
+// ConnectDB connects to the MySQL database
 func ConnectDB() {
-    LoadEnv()
+	var err error
 
-    // Get environment variables or set default values
-    dbUser := os.Getenv("DB_USER")
-    dbPassword := os.Getenv("DB_PASSWORD")
-    dbHost := os.Getenv("DB_HOST")
-    dbPort := os.Getenv("DB_PORT")
-    dbName := os.Getenv("DB_NAME")
+	// MySQL connection string: "user:password@tcp(127.0.0.1:3306)/dbname?charset=utf8&parseTime=True&loc=Local"
+	connStr := os.Getenv("DB_URL")
 
-    // Format the database connection string
-    dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", 
-        dbUser, dbPassword, dbHost, dbPort, dbName)
-
-    var err error
-    DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-    if err != nil {
-       
+	DB, err = gorm.Open("mysql", connStr)
+	if err != nil {
+		panic("failed to connect to database: " + err.Error())
+	}
+	fmt.Println("Database connected!")
+}
